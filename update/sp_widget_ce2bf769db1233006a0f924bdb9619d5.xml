@@ -92,7 +92,17 @@
         <script><![CDATA[(function() {
 	data.calls =[];
 	data.runtime = "https://flex.twilio.com/";
-	console.log('@@@ step1');
+	console.log('@@@ step12');
+
+  var testt = {
+    sys_id: 'd94a0f832fdf011061ea56e62799b668',
+    number: '123',
+    caller: '+4917672899431',
+    url: '/incident.do?sys_id=d94a0f832fdf011061ea56e62799b668',
+    added_class = 'active';
+  };
+  data.calls.push(testt);
+
 	var calls_gr = new GlideRecord('incident');
 	calls_gr.addEncodedQuery('active=true^contact_type=twilio_flex^assigned_toDYNAMIC90d1921e5f510100a9ad2572f2b477fe^x_8725_servicenow_twilio_integration_informationNOT LIKEcall_completed^NQactive=true^x_8725_servicenow_twilio_integration_informationLIKEjavascript:gs.getUserID()^x_8725_servicenow_twilio_integration_informationNOT LIKEcall_completed');
 	calls_gr.orderBy('number');
