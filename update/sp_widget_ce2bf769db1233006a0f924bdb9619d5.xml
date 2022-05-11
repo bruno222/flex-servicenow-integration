@@ -99,7 +99,7 @@
     number: '123',
     caller: '+4917672899431',
     url: '/incident.do?sys_id=d94a0f832fdf011061ea56e62799b668',
-    added_class = 'active';
+    added_class: 'active'
   };
   data.calls.push(testt);
 
