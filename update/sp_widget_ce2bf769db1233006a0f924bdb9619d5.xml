@@ -92,36 +92,8 @@
         <script><![CDATA[(function() {
 	data.calls =[];
 	data.runtime = "https://flex.twilio.com/";
-	console.log('@@@ step12');
-
-  const receiveMessage = (ev) => {
-    console.log('@@ servicenow postMessage received: ', ev.data);
-    const msg = ev.data;
-
-    if (!msg.sys_id) {
-      data.calls = [];
-      return;
-    }
-
-    data.calls = [{
-        sys_id: msg.sys_id, // 'd94a0f832fdf011061ea56e62799b668',
-        number: msg.number, // '123',
-        caller: sys_id.caller, // '+4917672899431',
-        url: `/incident.do?sys_id=${msg.sys_id}`,
-        added_class: 'active'
-      }]
-  };
-  window.addEventListener('message', receiveMessage, false);
-
-  // var testt = {
-  //   sys_id: 'd94a0f832fdf011061ea56e62799b668',
-  //   number: '123',
-  //   caller: '+4917672899431',
-  //   url: '/incident.do?sys_id=d94a0f832fdf011061ea56e62799b668',
-  //   added_class: 'active'
-  // };
-  // data.calls.push(testt);
-
+	console.log('@@@ step123');
+  
 	var calls_gr = new GlideRecord('incident');
 	calls_gr.addEncodedQuery('active=true^contact_type=twilio_flex^assigned_toDYNAMIC90d1921e5f510100a9ad2572f2b477fe^x_8725_servicenow_twilio_integration_informationNOT LIKEcall_completed^NQactive=true^x_8725_servicenow_twilio_integration_informationLIKEjavascript:gs.getUserID()^x_8725_servicenow_twilio_integration_informationNOT LIKEcall_completed');
 	calls_gr.orderBy('number');
@@ -168,20 +140,83 @@
                     <h3 class="panel-title">&nbsp;</h3>
                     <span class="pull-right">
                         <!-- Tabs -->
-                        <ul class="nav panel-tabs">
-                            <li class="{{call.added_class}}" ng-repeat="call in c.data.calls" onclick="testFunction(this)" id="#li_{{call.sys_id}}"><a href="#tab_{{call.sys_id}}" data-toggle="tab">{{call.number}}</a></li>
+                        <ul id="webform" class="nav panel-tabs" style="display: none">
+                            <li class="active" onclick="testFunction(this)" id="lii"><a href="#" id="numberr" data-toggle="tab">Ticket</a></li>
+                            <li class="active" onclick="shopping(); event.preventDefault();" id="lii2"><a href="#" id="shopping" data-toggle="tab">Prepare Quote</a></li>
+                            <li class="active" onclick="sendEmail('d-1a931b9db6b044ec9f1c982e3a8d8554'); event.preventDefault();" id="lii3"><a href="#" id="shopping2" data-toggle="tab">Send Quote</a></li>
                         </ul>
+                        <ul id="installation-dates" class="nav panel-tabs" style="display: none">
+                            <li class="active" onclick="sendEmail('d-1c8b5bd86ecd4b018162c42952fbb180'); event.preventDefault();" id="lii34"><a href="#" data-toggle="tab">Send Installation Dates</a></li>
+                        </ul>
+                        <ul id="breakdown" class="nav panel-tabs" style="display: none">
+                            <li class="active" onclick="event.preventDefault();" id="lii2"><a href="#" id="shopping" data-toggle="tab">Call Build Owner</a></li>
+                            <li class="active" onclick="sendEmail('d-0ef658aa662f41efb10c31b9a73152d0'); event.preventDefault();" id="lii3"><a href="#" id="shopping2" data-toggle="tab">Notify Build Owner</a></li>
+                        </ul>                        
+
                     </span>
                 </div>
                 <div class="panel-body">
                     <div class="tab-content">
-                        <div ng-repeat="call_frame in c.data.calls track by call_frame.sys_id" class="tab-pane {{call_frame.added_class}}" id="tab_{{call_frame.sys_id}}">
-                       	  <iframe id="call_{{call_frame.sys_id}}_iframe"  width="100%" height="100%" frameborder="0" ng-src="{{call_frame.url}}"></iframe>
+                        <div class="tab-pane active" id="tab_123">
+                       	  <iframe id="call_iframe"  width="100%" height="100%" frameborder="0" src=""></iframe>
                       </div>
                 </div>
             </div>  
 </div>
   <script>
+    const receiveMessage = ({data}) => {
+        console.log('@@ servicenow postMessage received: ', data);
+
+        document.getElementById('installation-dates').style.display = 'none';
+        document.getElementById('webform').style.display = 'none';
+        if (data.reason) {
+          document.getElementById(data.reason).style.display = '';
+        }
+
+        if (data.sys_id) {
+          const url = '/incident.do?sys_id='+data.sys_id;
+          document.getElementById('call_iframe').src = url;
+          
+        } else {
+          document.getElementById('call_iframe').src=data.full_url || '';          
+        }
+      };
+    window.addEventListener('message', receiveMessage, false);
+
+    function shopping() {
+      document.getElementById("call_iframe").src = "/com.glideapp.servicecatalog_category_view.do?v=1&sysparm_parent=d258b953c611227a0146101fb1be7c31&sysparm_no_checkout=false&sysparm_ck=01390b432fdf011061ea56e62799b64bf98a5c9a6b6d5e1ac645d4bd5f6ee7999529e7e8&sysparm_view=catalog_default&sysparm_catalog=e0d08b13c3330100c8b837659bba8fb4&sysparm_catalog_view=catalog_default";
+    } 
+
+    function sendEmail(id) {
+            console.log('@@ sending email...', id);
+
+            var myHeaders = new Headers();
+            myHeaders.append("Content-Type", "application/json");
+            
+            var raw = JSON.stringify({
+              "to": "bkilian@twilio.com",
+              "templateId": id
+            });
+            
+            var requestOptions = {
+              method: 'POST',
+              headers: myHeaders,
+              body: raw,
+              redirect: 'follow'
+            };
+            
+            fetch("https://manual-tests-bruno-4255.twil.io/send_email", requestOptions)
+              .then(response => response.text())
+              .then(result => {
+                console.log('@@sendgrid return',result);
+                alert('Email was sent.');
+              })
+              .catch(error => {
+                console.log('@@error', error);
+                alert('ERROR');
+                });            
+          }
+           
     function testFunction(el)
 	{
       	if(el.className == 'active')
